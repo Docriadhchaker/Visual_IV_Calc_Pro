@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual IV Calculator - Dr. Riadh Chaker</title>
+    <style>
+        :root {
+            --primary: #007AFF; /* Bleu médical */
+            --bg: #F5F7FA;
+            --card-bg: #FFFFFF;
+            --text: #1F2937;
+            --text-light: #6B7280;
+            --accent: #10B981; /* Vert succès */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+
+        /* Partie Gauche : Inputs */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+        }
+
+        input, select {
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+            background: #FAFAFA;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .row > div {
+            flex: 1;
+        }
+
+        /* Partie Droite : Résultats & Visuel */
+        .result-section {
+            background: #F0F9FF;
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #BAE6FD;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .results {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .big-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .unit {
+            font-size: 16px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .secondary-result {
+            margin-top: 15px;
+            font-size: 18px;
+            color: var(--text);
+        }
+
+        /* L'Animation de la goutte */
+        .drip-container {
+            margin-top: 30px;
+            width: 80px;
+            height: 160px;
+            position: relative;
+            background: rgba(255,255,255,0.8);
+            border-radius: 0 0 40px 40px;
+            border: 3px solid #CBD5E1;
+            border-top: none;
+            display: flex;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,122,255,0.05);
+        }
+
+        .drip-chamber {
+            position: absolute;
+            top: -20px;
+            width: 40px;
+            height: 40px;
+            background: #E2E8F0;
+            border-radius: 4px;
+            border: 2px solid #94A3B8;
+        }
+
+        .drop {
+            width: 14px;
+            height: 14px;
+            background: var(--primary);
+            border-radius: 50% 0 50% 50%;
+            transform: rotate(-45deg);
+            position: absolute;
+            top: 20px;
+            opacity: 0;
+            animation-name: fall;
+            animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+            animation-iteration-count: infinite;
+        }
+
+        .liquid-pool {
+            position: absolute;
+            bottom: 10px;
+            width: 60px;
+            height: 15px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.2;
+            animation: ripple 2s infinite;
+        }
+
+        @keyframes fall {
+            0% { top: 10px; opacity: 1; transform: scale(0.8) rotate(-45deg); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 140px; opacity: 0; transform: scale(1) rotate(-45deg); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.2; }
+            50% { transform: scale(1.1); opacity: 0.1; }
+            100% { transform: scale(1); opacity: 0.2; }
+        }
+
+        /* Footer credits - Signature Dr. Chaker */
+        .footer-credits {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+            font-size: 12px;
+            text-align: center;
+            color: #9CA3AF;
+        }
+        
+        .footer-credits strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            .big-number {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Section Inputs -->
+        <div class="input-section">
+            <div>
+                <h1>IV Drip Calculator</h1>
+                <div class="subtitle">Calculateur de débit de perfusion</div>
+            </div>
+
+            <div class="input-group">
+                <label>Volume total (mL)</label>
+                <input type="number" id="volume" placeholder="ex: 500" value="500">
+            </div>
+
+            <div class="row">
+                <div class="input-group">
+                    <label>Durée</label>
+                    <input type="number" id="duration" placeholder="ex: 8" value="8">
+                </div>
+                <div class="input-group">
+                    <label>Unité</label>
+                    <select id="timeUnit">
+                        <option value="hours">Heures</option>
+                        <option value="minutes">Minutes</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Facteur Gouttes (Gouttes/mL)</label>
+                <select id="dropFactor">
+                    <option value="20" selected>20 (Standard/Adultes)</option>
+                    <option value="60">60 (Pédiatrie/Micro)</option>
+                    <option value="15">15 (Sang)</option>
+                    <option value="10">10 (Tubulure large)</option>
+                </select>
+            </div>
+            
+            <!-- Signature Dr. Chaker -->
+            <div class="footer-credits">
+                Designed by <strong>Dr. Riadh Chaker</strong><br>
+                Offline Secure Tool
+            </div>
+        </div>
+
+        <!-- Section Résultats -->
+        <div class="result-section">
+            <div class="results">
+                <div class="big-number" id="gttsResult">21</div>
+                <div class="unit">Gouttes / minute</div>
+                
+                <div class="secondary-result">
+                    <strong id="mlHrResult">63</strong> mL/heure
+                </div>
+            </div>
+
+            <!-- Visualisation -->
+            <div class="drip-container">
+                <div class="drip-chamber"></div>
+                <div class="drop" id="visualDrop"></div>
+                <div class="liquid-pool"></div>
+            </div>
+            
+            <div style="font-size: 10px; color: #64748B; margin-top: 10px;">
+                Visualisation synchronisée en temps réel
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sélection des éléments
+        const inputs = document.querySelectorAll('input, select');
+        const gttsDisplay = document.getElementById('gttsResult');
+        const mlHrDisplay = document.getElementById('mlHrResult');
+        const visualDrop = document.getElementById('visualDrop');
+
+        // Fonction de calcul principale
+        function calculate() {
+            let volume = parseFloat(document.getElementById('volume').value) || 0;
+            let duration = parseFloat(document.getElementById('duration').value) || 0;
+            let timeUnit = document.getElementById('timeUnit').value;
+            let dropFactor = parseFloat(document.getElementById('dropFactor').value);
+
+            if (duration === 0) {
+                gttsDisplay.textContent = "--";
+                mlHrDisplay.textContent = "--";
+                visualDrop.style.animationDuration = '0s';
+                visualDrop.style.opacity = '0';
+                return;
+            }
+
+            let minutes = (timeUnit === 'hours') ? duration * 60 : duration;
+            let hours = (timeUnit === 'hours') ? duration : duration / 60;
+
+            let gttsPerMin = (volume * dropFactor) / minutes;
+            let mlPerHour = volume / hours;
+
+            gttsDisplay.textContent = Math.round(gttsPerMin);
+            mlHrDisplay.textContent = mlPerHour.toFixed(1);
+
+            updateAnimation(gttsPerMin);
+        }
+
+        // Fonction pour gérer la vitesse de la goutte
+        function updateAnimation(gttsPerMin) {
+            if (gttsPerMin <= 0) {
+                visualDrop.style.opacity = '0';
+                return;
+            }
+
+            visualDrop.style.opacity = '1';
+            let durationInSeconds = 60 / gttsPerMin;
+            if (durationInSeconds < 0.2) durationInSeconds = 0.2; 
+
+            visualDrop.style.animationDuration = `${durationInSeconds}s`;
+            document.querySelector('.liquid-pool').style.animationDuration = `${durationInSeconds}s`;
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', calculate);
+            input.addEventListener('change', calculate);
+        });
+
+        calculate();
+    </script>
+</body>
+</html>
